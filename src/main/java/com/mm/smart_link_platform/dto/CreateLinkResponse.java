@@ -1,4 +1,4 @@
-package com.mm.smart_link_platforn.dto;
+package com.mm.smart_link_platform.dto;
 
 import lombok.Builder;
 

@@ -1,4 +1,4 @@
-package com.mm.smart_link_platforn.entity;
+package com.mm.smart_link_platform.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
