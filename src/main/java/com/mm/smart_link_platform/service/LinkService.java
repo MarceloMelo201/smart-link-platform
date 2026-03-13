@@ -10,5 +10,5 @@ public interface LinkService {
 
     CreateLinkResponse createShortLink(CreateLinkRequest request);
     Link findByShortCode(String shortCode);
-    void incrementAccessCount(UUID LinkId);
+    void incrementAccessCount(UUID linkId);
 }
