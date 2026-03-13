@@ -5,7 +5,7 @@ import lombok.Builder;
 @Builder
 public record CreateLinkResponse(
 
-        String shortUrl,
-        String qrCodeUrl
+        String shortUrl
+        //String qrCodeUrl
 ) {
 }
