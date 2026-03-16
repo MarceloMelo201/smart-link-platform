@@ -6,10 +6,10 @@ import org.springframework.retry.annotation.EnableRetry;
 
 @SpringBootApplication
 @EnableRetry
-public class SmartLinkPlatformApplication {
+public class Startup {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SmartLinkPlatformApplication.class, args);
+		SpringApplication.run(Startup.class, args);
 	}
 
 }
