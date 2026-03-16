@@ -9,17 +9,22 @@ import java.net.URISyntaxException;
 
 @Service
 public class ValidationServiceImpl implements ValidationService {
-    @Override
-    public void validateUrl(String url) {
-        validateNullOrBlank(url);
-        URI uri = validateUriSyntax(url);
-        validateProtocol(uri);
 
+    @Override
+    public String validateUrl(String url) {
+
+        validateNullOrBlank(url);
+        String normalizedUrl = normalizeUrl(url);
+        URI uri = validateUriSyntax(normalizedUrl);
+        validateProtocol(uri);
+        validateHost(uri);
+        return normalizedUrl;
     }
 
     private void validateNullOrBlank(String url) {
-        if(url == null || url.isBlank())
+        if (url == null || url.isBlank()) {
             throw new InvalidUrlException("The url cannot be null or blank.");
+        }
     }
 
     private URI validateUriSyntax(String url) {
@@ -43,13 +48,20 @@ public class ValidationServiceImpl implements ValidationService {
 
             throw new InvalidUrlException("Only HTTP and HTTPS protocols are allowed");
         }
-
     }
 
     private void validateHost(URI uri) {
         if (uri.getHost() == null) {
             throw new InvalidUrlException("URL must contain a valid host");
         }
+    }
 
+    private String normalizeUrl(String url) {
+
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            url = "https://" + url;
+        }
+
+        return url;
     }
 }

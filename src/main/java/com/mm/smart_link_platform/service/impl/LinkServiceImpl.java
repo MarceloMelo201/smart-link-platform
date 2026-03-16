@@ -20,6 +20,7 @@ import java.util.UUID;
 
 @Service
 public class LinkServiceImpl implements LinkService {
+    private static final int VALIDITY = 3;
 
     private final LinkRepository repository;
     private final TokenService tokenService;
@@ -39,14 +40,14 @@ public class LinkServiceImpl implements LinkService {
             backoff = @Backoff(delay = 100))
     public CreateLinkResponse createShortLink(CreateLinkRequest request) {
         String url = request.originalUrl();
-        validationService.validateUrl(url);
+        url = validationService.validateUrl(url);
         String shortCode = tokenService.generateShortCode();
 
         Link link = Link
                 .builder()
                 .originalUrl(url)
                 .shortCode(shortCode)
-                .expiresAt(LocalDateTime.now().plusDays(3))
+                .expiresAt(LocalDateTime.now().plusDays(VALIDITY))
                 .build();
 
         repository.save(link);
@@ -58,7 +59,7 @@ public class LinkServiceImpl implements LinkService {
         Link link = repository.findByShortCode(shortCode)
                 .orElseThrow(UrlNotFoundException::new);
 
-        if(link.isExpired())
+        if (link.isExpired())
             throw new LinkExpiredException();
 
         return link;
