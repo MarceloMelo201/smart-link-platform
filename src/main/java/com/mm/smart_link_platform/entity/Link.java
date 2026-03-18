@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -35,14 +34,7 @@ public class Link {
     private LocalDateTime expiresAt;
 
     @Column(name = "active", nullable = false)
-    private boolean active = true;
-
-    @Column(name = "access_count")
-    private int accessCount = 0;
-
-    public void increaseCount(){
-        this.accessCount += 1;
-    }
+    private boolean active;
 
     public boolean isExpired() {
         return expiresAt != null && LocalDateTime.now().isAfter(expiresAt);
