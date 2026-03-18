@@ -4,6 +4,7 @@ import com.mm.smart_link_platform.dto.CreateLinkRequest;
 import com.mm.smart_link_platform.dto.CreateLinkResponse;
 import com.mm.smart_link_platform.entity.Link;
 import com.mm.smart_link_platform.exception.LinkExpiredException;
+import com.mm.smart_link_platform.exception.LinkInactiveException;
 import com.mm.smart_link_platform.exception.UrlNotFoundException;
 import com.mm.smart_link_platform.repository.LinkRepository;
 import com.mm.smart_link_platform.service.LinkService;
@@ -16,11 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class LinkServiceImpl implements LinkService {
-    private static final int VALIDITY = 3;
+    private static final int LINK_VALIDITY_DAYS = 3;
 
     private final LinkRepository repository;
     private final TokenService tokenService;
@@ -47,7 +47,8 @@ public class LinkServiceImpl implements LinkService {
                 .builder()
                 .originalUrl(url)
                 .shortCode(shortCode)
-                .expiresAt(LocalDateTime.now().plusDays(VALIDITY))
+                .active(true)
+                .expiresAt(LocalDateTime.now().plusDays(LINK_VALIDITY_DAYS))
                 .build();
 
         repository.save(link);
@@ -62,14 +63,10 @@ public class LinkServiceImpl implements LinkService {
         if (link.isExpired())
             throw new LinkExpiredException();
 
+        if (!link.isActive())
+            throw new LinkInactiveException();
+
         return link;
     }
 
-    @Override
-    @Transactional
-    public void incrementAccessCount(UUID linkId) {
-        Link link = repository.findById(linkId).orElseThrow(UrlNotFoundException::new);
-        link.increaseCount();
-        repository.save(link);
-    }
 }
