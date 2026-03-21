@@ -1,32 +1,37 @@
 package com.mm.smart_link_platform.service.impl;
 
-import com.mm.smart_link_platform.entity.Link;
-import com.mm.smart_link_platform.service.AnalyticsService;
+import com.mm.smart_link_platform.dto.ClickEvent;
+import com.mm.smart_link_platform.dto.LinkResponse;
+import com.mm.smart_link_platform.messaging.producer.ClickEventProducer;
 import com.mm.smart_link_platform.service.LinkService;
 import com.mm.smart_link_platform.service.RedirectService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class RedirectServiceImpl implements RedirectService {
 
     private final LinkService linkService;
-    private final AnalyticsService analyticsService;
+    private final ClickEventProducer producer;
 
-    public RedirectServiceImpl(LinkService linkService, AnalyticsService analyticsService) {
+    public RedirectServiceImpl(LinkService linkService, ClickEventProducer producer) {
         this.linkService = linkService;
-        this.analyticsService = analyticsService;
+        this.producer = producer;
     }
 
     @Override
     public String resolveLink(String shortCode, String ip, String userAgent, String referer) {
-        Link link = linkService.findByShortCode(shortCode);
+        LinkResponse link = linkService.findByShortCode(shortCode);
+        ClickEvent clickEvent = ClickEvent
+                .builder()
+                .linkId(link.linkId())
+                .ip(ip)
+                .userAgent(userAgent)
+                .referer(referer)
+                .build();
 
-        try {
-            analyticsService.registerAccess(link, ip, userAgent, referer);
-        } catch (Exception ignored) {
-            //tratar posteriomente com a implementação da fila
-        }
-
-        return link.getOriginalUrl();
+        producer.publishClickEvent(clickEvent);
+        return link.originalUrl();
     }
 }
