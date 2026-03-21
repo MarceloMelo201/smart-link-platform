@@ -22,3 +22,10 @@ spring:
     show-sql: true
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    root: info
+    com.mm: debug
+  file:
+    name: logs/app.log
