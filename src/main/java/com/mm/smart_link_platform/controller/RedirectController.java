@@ -24,7 +24,11 @@ public class RedirectController {
             @PathVariable String shortCode,
             HttpServletRequest request) {
 
-        String ip = request.getRemoteAddr();
+        String ip = request.getHeader("X-Forwarded-For");
+
+        if (ip == null || ip.isEmpty()) {
+            ip = request.getRemoteAddr();
+        }
         String userAgent = request.getHeader("User-Agent");
         String referer = request.getHeader("Referer");
         String url = redirectService.resolveLink(shortCode, ip, userAgent, referer);
