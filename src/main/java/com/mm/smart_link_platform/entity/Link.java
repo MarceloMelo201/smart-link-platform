@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class Link {
+public class Link implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
