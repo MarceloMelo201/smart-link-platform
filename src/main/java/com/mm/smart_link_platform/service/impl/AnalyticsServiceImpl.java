@@ -1,14 +1,16 @@
 package com.mm.smart_link_platform.service.impl;
 
+import com.mm.smart_link_platform.dto.AccessLogResponse;
+import com.mm.smart_link_platform.dto.ClickEvent;
+import com.mm.smart_link_platform.dto.LinkResponse;
 import com.mm.smart_link_platform.dto.LinkStatsResponse;
 import com.mm.smart_link_platform.entity.AccessLog;
-import com.mm.smart_link_platform.entity.Link;
 import com.mm.smart_link_platform.repository.AccessRepository;
 import com.mm.smart_link_platform.service.AnalyticsService;
 import com.mm.smart_link_platform.service.LinkService;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class AnalyticsServiceImpl implements AnalyticsService {
@@ -22,15 +24,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public void registerAccess(Link link, String ip, String userAgent, String referer) {
-        UUID linkId = link.getLinkId();
-
+    public void registerAccess(ClickEvent clickEvent) {
         AccessLog access = AccessLog
                 .builder()
-                .linkId(linkId)
-                .ip(ip)
-                .userAgent(userAgent)
-                .referer(referer)
+                .linkId(clickEvent.linkId())
+                .ip(clickEvent.ip())
+                .userAgent(clickEvent.userAgent())
+                .referer(clickEvent.referer())
                 .build();
 
         accessRepository.save(access);
@@ -38,17 +38,31 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     @Override
     public LinkStatsResponse getLinkStats(String shortCode) {
-        Link link = linkService.findByShortCode(shortCode);
-        Long totalClicks = accessRepository.countByLinkId(link.getLinkId());
-        Long uniqueIps = accessRepository.countUniqueVisitors(link.getLinkId());
+        LinkResponse link = linkService.findByShortCode(shortCode);
+        Long totalClicks = accessRepository.countByLinkId(link.linkId());
+        Long uniqueIps = accessRepository.countUniqueVisitors(link.linkId());
+        List<AccessLogResponse> accessLogResponses = accessRepository
+                .findTop10ByLinkIdOrderByAccessTimeDesc(link.linkId())
+                        .stream()
+                        .map(this::toAccessResponse).toList();
 
         return LinkStatsResponse
                 .builder()
-                .originalUrl(link.getOriginalUrl())
-                .shortUrl(link.getShortCode())
+                .originalUrl(link.originalUrl())
+                .shortCode(link.shortCode())
                 .totalClicks(totalClicks)
                 .uniqueIps(uniqueIps)
-                .createdAt(link.getCreatedAt())
+                .createdAt(link.createdAt())
+                .recentAccesses(accessLogResponses)
+                .build();
+    }
+
+    private AccessLogResponse toAccessResponse(AccessLog accessLog) {
+        return AccessLogResponse
+                .builder()
+                .id(accessLog.getId())
+                .LinkId(accessLog.getLinkId())
+                .accessTime(accessLog.getAccessTime())
                 .build();
     }
 }
