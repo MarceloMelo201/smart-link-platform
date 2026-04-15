@@ -1,10 +1,10 @@
 # 🔗 Smart Link Platform
 
-Encurtador de URLs com rastreamento de acessos e processamento assíncrono utilizando mensageria.
+Encurtador de URLs com rastreamento de acessos e processamento assíncrono utilizando RabbitMQ.
 
 ---
 
-## Sobre o projeto: 
+## Visão geral 
 
 O Smart Link Platform é uma API backend desenvolvida em Java com Spring Boot que permite:
 
@@ -17,7 +17,7 @@ O projeto foi desenvolvido com foco em boas práticas de mercado, incluindo arqu
 
 --- 
 
-## Arquitetura:
+## Arquitetura
 
 A aplicação segue uma arquitetura baseada em:
 
@@ -35,7 +35,7 @@ Fluxo simplificado:
 
 ---
 
-## Tecnologias Utilizadas: 
+## Tecnologias
 
 - Java 21
 - Spring Boot
@@ -48,7 +48,7 @@ Fluxo simplificado:
 
 ---
 
-## Como Executar com Docker: 
+## Como Executar com Docker 
 
 ### Pré-requisitos 
 - **Docker**
@@ -56,7 +56,7 @@ Fluxo simplificado:
 
 --- 
 
-## Subir toda a aplicação:
+## Subir toda a aplicação
 
 ``` 
 mvn clean package -DskipTests  
@@ -65,10 +65,10 @@ docker compose up --build
 ```
 ---
 
-## Serviços disponíveis: 
+## Serviços disponíveis 
 
 1. **API**: http://localhost:8081
-2. **Swagger**: http://localhost:8081/swagger-ui.html
+2. **Swagger**: http://localhost:8081/swagger-ui/index.html
 3. **RabbitMQ UI**: http://localhost:15672
 
 --- 
@@ -80,9 +80,9 @@ docker compose up --build
 
 --- 
 
-## Endpoints: 
+## Endpoints
 
-### Criar link: 
+### Criar link 
 
 POST /api/links
 
@@ -131,7 +131,7 @@ Response:
 
 ---
 
-## Tratamento de erros: 
+## Tratamento de erros
 
 
 | Erro | Situação            | 
@@ -142,7 +142,7 @@ Response:
 
 --- 
 
-## Testes:
+## Testes
 
 O projeto possui testes automatizados utilizando:
 
@@ -151,13 +151,13 @@ O projeto possui testes automatizados utilizando:
 
 Os testes são executados com banco em memória (H2), garantindo isolamento e independência da infraestrutura.
 
-``
+```bash
 mvn test
-``
+```
 
 --- 
 
-## Observabilidade:
+## Observabilidade
 
 ### Endpoints disponíveis via Spring Actuator:
 
@@ -167,7 +167,7 @@ mvn test
 
 
 --- 
-## Melhorias Futuras: 
+## Melhorias Futuras 
 
 - Autenticação e autorização (Spring Security)
 - Rate limiting
@@ -176,12 +176,28 @@ mvn test
 - Testcontainers para testes com infraestrutura real
 ---
 
-## Autor: 
+## Demonstração
+
+### 🔗 Criação de link
+![Criação de link](./PNG/link.png)
+
+---
+
+### 🔁 Redirecionamento
+![Redirecionamento](./PNG/Redirecionamento.png)
+
+---
+
+### 📊 Aumento de métricas
+![Aumento de métricas](./PNG/Metricas.png)
+
+--- 
+## Autor
 
 Desenvolvido por **Marcelo Melo**.
 
 --- 
 
-## Licença: 
+## Licença
 
 Este projeto é para fins de estudo e portfólio.
