@@ -5,10 +5,8 @@ import com.mm.smart_link_platform.dto.LinkResponse;
 import com.mm.smart_link_platform.messaging.producer.ClickEventProducer;
 import com.mm.smart_link_platform.service.LinkService;
 import com.mm.smart_link_platform.service.RedirectService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 public class RedirectServiceImpl implements RedirectService {
 
@@ -22,7 +20,7 @@ public class RedirectServiceImpl implements RedirectService {
 
     @Override
     public String resolveLink(String shortCode, String ip, String userAgent, String referer) {
-        LinkResponse link = linkService.findByShortCode(shortCode);
+        LinkResponse link = linkService.findActiveLinkByShortCode(shortCode);
         ClickEvent clickEvent = ClickEvent
                 .builder()
                 .linkId(link.linkId())

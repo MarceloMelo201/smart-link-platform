@@ -12,6 +12,7 @@ import com.mm.smart_link_platform.service.LinkService;
 import com.mm.smart_link_platform.service.TokenService;
 import com.mm.smart_link_platform.service.ValidationService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -23,7 +24,9 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 public class LinkServiceImpl implements LinkService {
-    private static final int LINK_VALIDITY_DAYS = 3;
+
+    @Value("${link.expiration-days}")
+    private int linkValidityDays;
 
     private final LinkRepository repository;
     private final TokenService tokenService;
@@ -51,11 +54,11 @@ public class LinkServiceImpl implements LinkService {
                 .originalUrl(url)
                 .shortCode(shortCode)
                 .active(true)
-                .expiresAt(LocalDateTime.now().plusDays(LINK_VALIDITY_DAYS))
+                .expiresAt(LocalDateTime.now().plusDays(linkValidityDays))
                 .build();
 
         repository.save(link);
-        log.info("Saving to database entity link. | linkId={}", link.getLinkId());
+        log.info("Link created | linkId={} | shortCode={}", link.getLinkId(), link.getShortCode());
         return new CreateLinkResponse(link.getShortCode());
     }
 
@@ -64,13 +67,31 @@ public class LinkServiceImpl implements LinkService {
         Link link = repository.findByShortCode(shortCode)
                 .orElseThrow(UrlNotFoundException::new);
 
+        return LinkResponse
+                .builder()
+                .linkId(link.getLinkId())
+                .originalUrl(link.getOriginalUrl())
+                .shortCode(link.getShortCode())
+                .createdAt(link.getCreatedAt())
+                .expiresAt(link.getExpiresAt())
+                .build();
+    }
+
+    @Override
+    @Transactional(noRollbackFor = LinkExpiredException.class)
+    public LinkResponse findActiveLinkByShortCode(String shortCode) {
+        Link link = repository.findByShortCode(shortCode)
+                .orElseThrow(UrlNotFoundException::new);
+
         if (link.isExpired()) {
-            log.error("Link is expired | linkId={}", link.getLinkId());
+            log.warn("Link is expired | linkId={}", link.getLinkId());
+            link.setActive(false);
+            repository.save(link);
             throw new LinkExpiredException();
         }
 
         if (!link.isActive()) {
-            log.error("Link is inactive | linkId={}", link.getLinkId());
+            log.warn("Link is inactive | linkId={}", link.getLinkId());
             throw new LinkInactiveException();
         }
 
