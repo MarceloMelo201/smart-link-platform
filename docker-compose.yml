@@ -1,12 +1,24 @@
 version: "3.9"
 
 services:
+
+  app:
+    build: .
+    container_name: smart-link-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
-
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -15,24 +27,19 @@ services:
     image: postgres:16
     container_name: postgres_url
     restart: unless-stopped
-
     ports:
       - "5435:5432"
-
     environment:
       POSTGRES_DB: smart_platform_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
-
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-
 
 volumes:
   postgres_data:
