@@ -176,7 +176,13 @@ mvn test
 - Testcontainers para testes com infraestrutura real
 ---
 
-## Demonstração
+## 🎬 Demonstração
+
+![Demo do projeto](./PNG/demo.gif)
+
+--- 
+
+## Funcionalidades
 
 ### 🔗 Criação de link
 ![Criação de link](./PNG/Link.png)
